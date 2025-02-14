@@ -80,9 +80,9 @@ let updatePointsInput = () => {
   pointsInput.value = points
     .map(
       (point) =>
-        `${point.location.lat},${point.location.lng}${
-          point.name && "," + point.name
-        }`,
+        `${Number(point.location.lat).toFixed(5)},${Number(
+          point.location.lng,
+        ).toFixed(5)}${point.name && "," + point.name}`,
     )
     .join("\n");
 };
