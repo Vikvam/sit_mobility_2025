@@ -1,9 +1,7 @@
-import { createApp } from "./petite-vue.js";
-
-const getIsochrone = async ({ location: [lat, lon], time, minutes }) => {
+let getIsochrone = async ({ location: { lat, lng }, time, minutes }) => {
   let params = new URLSearchParams();
   params.append("batch", "true");
-  params.append("location", `${lat},${lon}`);
+  params.append("location", `${lat},${lng}`);
   params.append("time", time);
   //params.append("modes", "WALK,TRANSIT");
   params.append("cutoff", `${minutes}M`);
@@ -18,27 +16,39 @@ const getIsochrone = async ({ location: [lat, lon], time, minutes }) => {
   }
 };
 
-let map = L.map("map").setView([49.74747, 13.37759], 13);
+let location = { lat: 49.74747, lng: 13.37759 };
+let map = L.map("map").setView(location, 13);
+let marker = L.marker(location).addTo(map);
+marker.addTo(map);
 
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
-let isochroneLayer = null;
 
-createApp({
-  minutes: "20",
-  date: "2025-02-14T12:00",
-  async updateIsochrone() {
-    let isochrone = await getIsochrone({
-      location: [49.74747, 13.37759],
-      time: this.date + ":00+01:00",
-      minutes: this.minutes,
-    });
+let minutes = document.getElementById("minutes");
+let time = document.getElementById("time");
+
+let isochroneLayer = null;
+let updateIsochrone = () => {
+  getIsochrone({
+    location,
+    time: time.value + ":00+01:00",
+    minutes: minutes.value,
+  }).then((isochrone) => {
     if (isochroneLayer) {
       isochroneLayer.remove();
     }
     isochroneLayer = L.geoJSON(isochrone);
     isochroneLayer.addTo(map);
-  },
-}).mount();
+  });
+};
+
+minutes.addEventListener("change", updateIsochrone);
+time.addEventListener("change", updateIsochrone);
+map.on("click", (event) => {
+  location = event.latlng;
+  marker.setLatLng(location);
+  updateIsochrone();
+});
+updateIsochrone();

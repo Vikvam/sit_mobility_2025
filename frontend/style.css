@@ -1,3 +1,21 @@
+body {
+  color-scheme: light dark;
+  font-family: sans-serif;
+}
+
 #map {
-  height: var(--size-15);
+  height: 80vh;
+}
+
+.controls {
+  margin-block: var(--size-2);
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--size-2);
+}
+
+h1 {
+  font-size: var(--font-size-4);
+  font-variant-caps: small-caps;
+  text-align: center;
 }

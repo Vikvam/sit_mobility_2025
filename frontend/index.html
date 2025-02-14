@@ -12,9 +12,14 @@
     <script type="module" src="script.js"></script>
   </head>
   <body>
-    <div>
-      <input type="number" v-model="minutes" @change="updateIsochrone" />
-      <input type="datetime-local" v-model="date" @change="updateIsochrone" />
+    <h1>IzoChro</h1>
+    <div class="controls">
+      <label
+        >Čas: <input id="time" type="datetime-local" value="2025-02-14T12:00" />
+      </label>
+      <label
+        >Limit (min): <input id="minutes" type="number" value="20"
+      /></label>
     </div>
     <div id="map" v-effect="updateIsochrone()"></div>
   </body>
