@@ -29,6 +29,9 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 let minutes = document.getElementById("minutes");
 let time = document.getElementById("time");
 let pointsInput = document.getElementById("points");
+let date = new Date();
+date.setUTCHours(date.getHours());
+time.value = date.toISOString().slice(0, 16);
 
 let addPoint = (name, location) => {
   let markerLocation = null;
@@ -52,6 +55,7 @@ let addPoint = (name, location) => {
         points.findIndex((p) => p === point),
         1,
       );
+      updatePointsInput();
       updateIsochrone();
     });
   points.push(point);
