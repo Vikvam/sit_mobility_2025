@@ -4,7 +4,7 @@ body {
 }
 
 #map {
-  height: 80vh;
+  height: 70vh;
 }
 
 .controls {
@@ -12,10 +12,25 @@ body {
   display: flex;
   flex-flow: row wrap;
   gap: var(--size-2);
+  align-items: center;
+}
+
+label {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: var(--size-1);
+  align-items: center;
 }
 
 h1 {
   font-size: var(--font-size-4);
   font-variant-caps: small-caps;
   text-align: center;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #000;
+    color: #fff;
+  }
 }
