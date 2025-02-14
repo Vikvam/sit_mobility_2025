@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>IzoChro</title>
+    <link rel="stylesheet" href="open-props.min.css" />
+    <link rel="stylesheet" href="leaflet/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="leaflet/leaflet.js"></script>
+    <script type="module" src="script.js"></script>
+  </head>
+  <body>
+    <div>
+      <input type="number" v-model="minutes" @change="updateIsochrone" />
+      <input type="datetime-local" v-model="date" @change="updateIsochrone" />
+    </div>
+    <div id="map" v-effect="updateIsochrone()"></div>
+  </body>
+</html>
