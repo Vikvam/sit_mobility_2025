@@ -504,8 +504,8 @@ function loadHasici() {
             intersect_en.checked = true;
             union_en.checked = false;
             break;
-    case "uhorim":
-      setName("Uhořim");
+    case "shorim":
+      setName("Shořim?");
       loadHasici()
       document.querySelector('input[value="valhalla"]').checked = true;
       individual_en.checked = false;

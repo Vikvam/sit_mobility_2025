@@ -189,10 +189,10 @@ body.potkej-se {
   --surface-1: var(--pink-10);
   --surface-2: var(--purple-12);
 }
-body.uhorim .uhorim-hide {
+body.shorim .shorim-hide {
   display: none;
 }
-body.uhorim {
+body.shorim {
   --brand: var(--orange-4);
   --surface-1: var(--orange-10);
   --surface-2: var(--red-12);
