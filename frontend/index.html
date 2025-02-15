@@ -1,38 +1,45 @@
 <!doctype html>
 <html lang="cs">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <link rel="icon" href="data:," />
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <link rel="icon" href="data:,"/>
     <title>IzoChro</title>
-    <link rel="stylesheet" href="open-props.min.css" />
-    <link rel="stylesheet" href="leaflet/leaflet.css" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="open-props.min.css"/>
+    <link rel="stylesheet" href="leaflet/leaflet.css"/>
+    <link rel="stylesheet" href="style.css"/>
+    <script src="https://unpkg.com/polyline"></script>
     <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
     <script src="leaflet/leaflet.js"></script>
     <script type="module" src="script.js"></script>
 
-  </head>
-  <body>
-    <h1>MaxiChron</h1>
+</head>
+<body>
+<h1>MaxiChron</h1>
+<div class="wrapper">
     <div class="controls">
-      <label
-        >Čas cesty: <input id="time" type="datetime-local" value="2025-02-14T12:00" />
-      </label>
-      <label
-        >Maximální vzálenost (min): <input id="minutes" type="number" value="20"
-      /></label>
-      <div class="data-input">
-        <label>
-          Data (CSV):
+        <label
+        >Čas cesty: <input id="time" type="datetime-local" value="2025-02-14T12:00"/>
         </label>
-        <textarea id="points" rows="5" placeholder="lat,lon,Name"></textarea>
-          <div class="file-input-wrapper">
-            <span class="file-input-text">nebo vložte data ze souboru:</span>
-            <input id="points-file" type="file" id="csvFile" accept=".csv" />
-          </div>
-      </div>
+        <label
+        >Maximální vzálenost (min): <input id="minutes" type="number" value="20"
+        /></label>
+        <label for="union_en">Spojit do jedné oblasti <input type="checkbox" id="union_en"></label>
+        <label for="intersect_en">Najít průsečík oblastí <input type="checkbox" id="intersect_en"></label>
+        <label for="individual_en">Zobrazit jednotlivé oblasti <input type="checkbox" id="individual_en"></label>
+
+        <div class="data-input">
+            <label>
+                Data (CSV):
+            </label>
+            <textarea id="points" rows="5" placeholder="lat,lon,Name"></textarea>
+            <div class="file-input-wrapper">
+                <span class="file-input-text">nebo vložte data ze souboru:</span>
+                <input id="points-file" type="file" id="csvFile" accept=".csv"/>
+            </div>
+        </div>
     </div>
     <div id="map" v-effect="updateIsochrone()"></div>
-  </body>
+</div>
+</body>
 </html>
