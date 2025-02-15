@@ -73,6 +73,11 @@ let getUnionOfFeatures = (geojson) => {
     return union;
 }
 
+let getIntersectionOfFeatures = (geojson) => {
+    let intersection = turf.intersect(geojson);
+    return intersection;
+}
+
 let location = {lat: 49.74747, lng: 13.37759};
 let map = L.map("map").setView(location, 13);
 let points = [];
@@ -159,7 +164,20 @@ let addIsochrone = (point) => {
             console.log(isochroneLayers);
         })
 
-        // TODO: Update union if multiple isochrones exist
+        // TODO: FIX! Update union if multiple isochrones exist
+        if (isos.length > 1) {
+            let union = getUnionOfFeatures(combineGeoJsons(isos));
+            if (unionLayer) {
+                unionLayer.remove();
+            }
+            if (intersectLayer) {
+                intersectLayer.remove();
+            }
+            unionLayer = L.geoJSON(union, {color: "green"}).addTo(map);
+            let intersection = getIntersectionOfFeatures(combineGeoJsons(isos));
+            intersectLayer = L.geoJSON(intersection, {color: "red"}).addTo(map);
+
+        }
     } catch (error) {
         console.error(`Failed to add isochrone for point ${point}:`, error);
     }
@@ -239,8 +257,8 @@ function setupFileInput() {
       const lines = text.trim().split('\n');
       const isValid = lines.every(line => {
         const parts = line.trim().split(',');
-        return parts.length >= 2 && 
-               !isNaN(parseFloat(parts[0])) && 
+        return parts.length >= 2 &&
+               !isNaN(parseFloat(parts[0])) &&
                !isNaN(parseFloat(parts[1]));
       });
 
