@@ -32,6 +32,11 @@ let getUnionOfFeatures = (geojson) => {
     return union;
 }
 
+let getIntersectionOfFeatures = (geojson) => {
+    let intersection = turf.intersect(geojson);
+    return intersection;
+}
+
 let location = {lat: 49.74747, lng: 13.37759};
 let map = L.map("map").setView(location, 13);
 let points = [];
@@ -80,6 +85,7 @@ let addPoint = (name, location) => {
 
 let isochroneLayers = [];
 let unionLayer = null;
+let intersectLayer = null;
 
 let updateIsochrone = () => {
     let isos = []
@@ -107,11 +113,16 @@ let updateIsochrone = () => {
         );
         if (isos.length > 1) {
             let union = getUnionOfFeatures(combineGeoJsons(isos));
-            console.log(union);
             if (unionLayer) {
                 unionLayer.remove();
             }
-            unionLayer = L.geoJSON(union, {color: "orange"}).addTo(map);
+            if (intersectLayer) {
+                intersectLayer.remove();
+            }
+            unionLayer = L.geoJSON(union, {color: "green"}).addTo(map);
+            let intersection = getIntersectionOfFeatures(combineGeoJsons(isos));
+            intersectLayer = L.geoJSON(intersection, {color: "red"}).addTo(map);
+
         }
     });
 };
