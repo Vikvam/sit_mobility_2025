@@ -152,21 +152,16 @@ let updateUnionLayer = () => {
     if (unionLayer) { unionLayer.remove(); }
     if (isos.length > 1 && union_en.checked) {
         let union = getUnionOfFeatures(combineGeoJsons(isos));
-        console.log(union);
-        console.log(unionLayer);
         unionLayer = L.geoJSON(union, {color: "green"}).addTo(map);
     }
 }
 
 let updateIntersectionLayer = () => {
-        // if (isos.length > 1) {
-        // if (intersectLayer) {
-        //         intersectLayer.remove();
-        //     }
-        //     let intersection = getIntersectionOfFeatures(combineGeoJsons(isos));
-        //     intersectLayer = L.geoJSON(intersection, {color: "red"}).addTo(map);
-        //
-        // }
+    if (intersectLayer) { intersectLayer.remove(); }
+    if (isos.length > 1) {
+        let intersection = getIntersectionOfFeatures(combineGeoJsons(isos));
+        intersectLayer = L.geoJSON(intersection, {color: "black"}).addTo(map);
+    }
 }
 
 let addPoint = (name, location) => {
@@ -238,6 +233,7 @@ let addIsochrone = (point) => {
 
 let isochroneLayers = [];
 let unionLayer = null;
+let intersectLayer = null;
 
 let recomputeIsochrones = () => {
     Promise.all(points.map((point) => addIsochrone(point))).then(updateIsochrones)
