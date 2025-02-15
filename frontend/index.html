@@ -18,7 +18,7 @@
 <h1>Dojezdník</h1>
 <div class="wrapper">
     <div class="controls">
-        <div class="radio-group">
+        <div class="radio-group potkej-se-hide">
         <label>
             <input type="radio" name="routing-engine" value="OTP" checked> MHD
         </label>
@@ -32,11 +32,11 @@
         <label
         >Maximální vzálenost (min): <input id="minutes" type="number" value="20"
         /></label>
-        <label for="union_en">Spojit do jedné oblasti <input type="checkbox" id="union_en"></label>
-        <label for="intersect_en">Najít průsečík oblastí <input type="checkbox" id="intersect_en"></label>
+        <label class="potkej-se-hide" for="union_en">Spojit do jedné oblasti <input type="checkbox" id="union_en"></label>
+        <label class="potkej-se-hide" for="intersect_en">Najít průsečík oblastí <input type="checkbox" id="intersect_en"></label>
         <label for="individual_en">Zobrazit jednotlivé oblasti <input type="checkbox" id="individual_en" checked="true"></label>
 
-        <div class="data-input">
+        <div class="potkej-se-hide" class="data-input">
             <label>
                 Data (CSV):
             </label>

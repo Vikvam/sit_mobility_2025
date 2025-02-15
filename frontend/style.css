@@ -160,7 +160,11 @@ h1 {
     display: flex;
     flex-direction: row;
     gap: var(--size-3);
+  }
 }
 
-}
+/* modes */
 
+body.potkej-se .potkej-se-hide {
+  display: none;
+}
