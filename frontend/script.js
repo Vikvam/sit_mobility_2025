@@ -415,5 +415,12 @@ updatePoints();
       intersect_en.checked = true;
       union_en.checked = false;
       break;
+    case "uhorim":
+      setName("Uhořim");
+      document.querySelector('input[value="valhalla"]').checked = true;
+      individual_en.checked = false;
+      intersect_en.checked = false;
+      union_en.checked = true;
+      break;
   }
 }
