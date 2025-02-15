@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="leaflet/leaflet.css"/>
     <link rel="stylesheet" href="style.css"/>
     <script src="https://unpkg.com/polyline"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
     <script src="leaflet/leaflet.js"></script>
     <script type="module" src="script.js"></script>
 
@@ -16,13 +17,13 @@
 <body>
 <h1>Dojezdník</h1>
 <div class="wrapper">
-    <div class="controls">
+    <div class="controls shorim-hide">
         <div class="button-container">
             <button class="round-button blue-button" onclick="window.location.href='/'">Dojezdník</button>
             <button class="round-button red-button" onclick="window.location.search='mode=shorim'">Shořím?</button>
-            <button class="round-button black-button" onclick="window.location.search='mode=potkejse'">Potkej se</button>
+            <button class="round-button black-button" onclick="window.location.search='mode=potkej-se'">Potkej se</button>
         </div>
-        <div class="radio-group potkej-se-hide uhorim-hide">
+        <div class="radio-group potkej-se-hide shorim-hide">
             <span>
                 Mód dopravy:
             </span>
@@ -34,7 +35,7 @@
             </label>
         </div>
         <div class="times">
-            <label class="uhorim-hide"
+            <label class="shorim-hide"
             >Čas cesty: <input id="time" type="datetime-local" value="2025-02-14T12:00"/>
             </label>
             <label
@@ -43,13 +44,14 @@
         </div>
 
         <div class="operations">
-            <label class="potkej-se-hide uhorim-hide" for="union_en">Spojit do jedné oblasti <input type="checkbox" id="union_en"></label>
-            <label class="potkej-se-hide uhorim-hide" for="intersect_en">Najít průsečík oblastí <input type="checkbox" id="intersect_en"></label>
-            <label class="uhorim-hide" for="individual_en">Zobrazit jednotlivé oblasti <input type="checkbox" id="individual_en"
+            <label class="potkej-se-hide shorim-hide" for="union_en">Sjednotit oblasti<input type="checkbox" id="union_en"></label>
+            <label class="potkej-se-hide shorim-hide" for="intersect_en">Najít průsečík oblastí <input type="checkbox" id="intersect_en"></label>
+            <label class="shorim-hide" for="individual_en">Zobrazit jednotlivé isochrony <input type="checkbox" id="individual_en"
                                                                           checked="true"></label>
         </div>
 
-        <div class="categories">
+        <details class="categories potkej-se-hide shorim-hide">
+            <summary>Zájmové kategorie</summary>
             <div class="location-input">
                 <input type="text" id="coordinates" value="14.4378,50.0755" placeholder="14.4378,50.0755" pattern="-?\d+\.\d+,-?\d+\.\d+">
             </div>
@@ -72,9 +74,10 @@
 <!--                    <input type="checkbox" class="osm-category" value="leisure.swimming_pool"> Bazény-->
 <!--                </label>-->
             </div>
-        </div>
+        </details>
 
-        <div class="potkej-se-hide" class="data-input">
+        <details class="potkej-se-hide potkej-se-hide shorim-hide data-input">
+            <summary>Nahrát body ze souboru</summary>
             <label>
                 Data (CSV):
             </label>
@@ -84,7 +87,7 @@
                 <input id="points-file" type="file" id="csvFile" accept=".csv"/>
             </div>
             <button id="uploadButton">Insert Data</button>
-        </div>
+        </details>
     </div>
     <div id="map" v-effect="updateIsochrone()"></div>
 </div>

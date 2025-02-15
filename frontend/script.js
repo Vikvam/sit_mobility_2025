@@ -137,7 +137,7 @@ let getIntersectionOfFeatures = (geojson) => {
     return intersection;
 }
 
-let location = {lat: 49.74747, lng: 13.37759};
+let location = {lat: 50.08804, lng: 14.42076};
 let map = L.map("map").setView(location, 13);
 let points = [];
 let isos = [];
@@ -319,7 +319,7 @@ let updatePoints = async () => {
             name = name ?? "";
             addPoint(name, {lat, lng});
             console.log(points)
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await new Promise(resolve => setTimeout(resolve, 50));
         } else {
             console.log("Invalid line: " + line);
             return;
@@ -504,8 +504,8 @@ function loadHasici() {
             intersect_en.checked = true;
             union_en.checked = false;
             break;
-    case "uhorim":
-      setName("Uhořim");
+    case "shorim":
+      setName("Shořim?");
       loadHasici()
       document.querySelector('input[value="valhalla"]').checked = true;
       individual_en.checked = false;
