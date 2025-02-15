@@ -4,23 +4,58 @@ function generateColor(index) {
     return `hsl(${Math.floor(hue * 360)}, 70%, 50%)`;
 }
 
-let getIsochrone = async ({location: {lat, lng}, time, minutes}) => {
-    let params = new URLSearchParams();
-    params.append("batch", "true");
-    params.append("location", `${lat},${lng}`);
-    params.append("time", time);
-    //params.append("modes", "WALK,TRANSIT");
-    params.append("cutoff", `${minutes}M`);
-    let response = await fetch(
-        "https://otp.basta.one/otp/traveltime/isochrone?" + params,
-        {headers: {Accept: "application/json"}},
-    );
-    if (response.ok) {
-        return await response.json();
-    } else {
-        throw new Error(`${response.status}: ${await response.text()}`);
+let getIsochrone = async ({location: {lat, lng}, time, minutes, routingEngine}) => {
+    if (routingEngine === 'OTP') {
+        let params = new URLSearchParams();
+        params.append("batch", "true");
+        params.append("location", `${lat},${lng}`);
+        params.append("time", time);
+        params.append("modes", "WALK,TRANSIT");
+        params.append("cutoff", `${minutes}M`);
+        
+        let response = await fetch(
+            "https://otp.basta.one/otp/traveltime/isochrone?" + params,
+            {headers: {Accept: "application/json"}},
+        );
+        
+        if (response.ok) {
+            return await response.json();
+        } else {
+            throw new Error(`${response.status}: ${await response.text()}`);
+        }
+    }
+    else { // Valhalla
+        const params = {
+            locations: [{ lat: lat, lon: lng }],
+            costing: "auto",
+            contours: [
+                { time: parseInt(minutes), color: "ff0000" }
+            ],
+            polygons: true,
+            show_locations: true,
+            date_time: time
+        };
+
+        let response = await fetch(
+            "https://valhalla1.openstreetmap.de/isochrone",
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(params)
+            }
+        );
+        
+        if (response.ok) {
+            return await response.json();
+        } else {
+            throw new Error(`${response.status}: ${await response.text()}`);
+        }
     }
 };
+
 
 let combineGeoJsons = (geoJsons) => {
     let combined = {
@@ -41,8 +76,8 @@ let getUnionOfFeatures = (geojson) => {
 let location = {lat: 49.74747, lng: 13.37759};
 let map = L.map("map").setView(location, 13);
 let points = [];
+let isos = [];
 let markers = [];
-
 
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution:
@@ -56,9 +91,21 @@ let date = new Date();
 date.setUTCHours(date.getHours());
 time.value = date.toISOString().slice(0, 16);
 
+let getIsochroneLayer = (isochrone, color) => {
+    console.log(isochrone);
+    return L.geoJSON(isochrone, {
+        color: color,
+        filter: (feature) => {
+            return feature.geometry.type === 'Polygon';
+        }
+    }).addTo(map);
+}
+
 let addPoint = (name, location) => {
     let markerLocation = null;
-    let point = {name, location};
+    const routingEngine = document.querySelector('input[name="routing-engine"]:checked').value;
+    let color = generateColor(points.length);
+    let point = {name, location, routingEngine, color};
     point.marker = L.marker(point.location, {
         title: point.name,
         alt: point.name,
@@ -66,7 +113,7 @@ let addPoint = (name, location) => {
         autoPan: true,
         icon: L.divIcon({
             className: 'custom-marker',
-            html: `<div style='background-color: ${generateColor(points.length)}; width: 1em; height: 1em;'></div>`
+            html: `<div style='background-color: ${point.color}; width: 1em; height: 1em;'></div>`
         })
     })
         .addTo(map)
@@ -74,55 +121,70 @@ let addPoint = (name, location) => {
         .on("moveend", () => {
             point.location = markerLocation;
             updatePointsInput();
-            updateIsochrone();
+            recomputeIsochrones();
         })
         .on("click", () => {
-            point.marker.remove();
-            points.splice(
-                points.findIndex((p) => p === point),
-                1,
-            );
-            updatePointsInput();
-            updateIsochrone();
+            removePoint(point);
         });
+    addIsochrone(point);
+
     points.push(point);
 };
+let removePoint = (point) => {
+    let index = points.findIndex((p) => p === point);
+
+    point.marker.remove();
+    points.splice(index, 1);
+    isos.splice(index, 1);
+    
+    updatePointsInput();
+    updateIsochrones();
+        
+    // TODO: updateUnionLayer();
+    
+};
+let addIsochrone = (point) => {
+    try {
+        getIsochrone({
+            location: point.location,
+            time: time.value + ":00+01:00",
+            minutes: minutes.value,
+            routingEngine: point.routingEngine,
+        }).then(isochrone => {
+            isos.push(isochrone);
+            isochroneLayers.push(getIsochroneLayer(isochrone, point.color));
+            
+            console.log(points);
+            console.log(isos);
+            console.log(isochroneLayers);
+        })
+
+        // TODO: Update union if multiple isochrones exist
+    } catch (error) {
+        console.error(`Failed to add isochrone for point ${point}:`, error);
+    }
+};
+
 
 let isochroneLayers = [];
 let unionLayer = null;
 
-let updateIsochrone = () => {
-    let isos = []
-    Promise.all(
-        points.map((point) => {
-            let iso = getIsochrone({
-                location: point.location,
-                time: time.value + ":00+01:00",
-                minutes: minutes.value,
-            })
-            return iso;
-            },
-        ),
-    ).then((isochrones) => {
-        for (let iso of isochrones) {
-            isos.push(iso);
-        }
-        for (let layer of isochroneLayers) {
-            layer.remove();
-        }
-        isochroneLayers = isochrones.map((isochrone) => {
-                let layer = L.geoJSON(isochrone, {}).addTo(map)
-                return layer;
-            },
-        );
-        if (isos.length > 1) {
-            let union = getUnionOfFeatures(combineGeoJsons(isos));
-            console.log(union);
-            if (unionLayer) {
-                unionLayer.remove();
-            }
-            unionLayer = L.geoJSON(union, {color: generateColor(points.length)}).addTo(map);
-        }
+let recomputeIsochrones = () => {
+    Promise.all(points.map((point) => addIsochrone(point))).then(updateIsochrones)
+};
+
+let updateIsochrones = () => {
+    for (let layer of isochroneLayers) {
+        layer.remove();
+    }
+    isochroneLayers = [];
+
+    // Create new layers from isos
+    isochroneLayers = [];
+    isos.forEach((isochrone, idx) => {
+        let layer = getIsochroneLayer(isochrone, points[idx].color);
+        layer.addTo(map);
+        isochroneLayers.push(layer);
     });
 };
 let updatePointsInput = () => {
@@ -136,7 +198,7 @@ let updatePointsInput = () => {
         .join("\n");
 };
 let updatePoints = () => {
-    points.forEach((point) => point.marker.remove());
+    points.forEach((point) => removePoint(point));
     points = [];
     for (let line of pointsInput.value.split("\n")) {
         let match = line.match(/^(\d+\.\d+),(\d+\.\d+)(?:,([^,]+))?$/);
@@ -151,20 +213,17 @@ let updatePoints = () => {
     }
 };
 
-minutes.addEventListener("change", updateIsochrone);
-time.addEventListener("change", updateIsochrone);
+minutes.addEventListener("change", recomputeIsochrones);
+time.addEventListener("change", recomputeIsochrones);
 pointsInput.addEventListener("change", () => {
     updatePoints();
-    updateIsochrone();
 });
 map.on("click", (event) => {
     location = event.latlng;
     addPoint("", event.latlng);
     updatePointsInput();
-    updateIsochrone();
+    updateIsochrones();
 });
-updatePoints();
-updateIsochrone();
 
 function setupFileInput() {
   const fileInput = document.getElementById('points-file');
@@ -192,8 +251,6 @@ function setupFileInput() {
 
       textarea.value = text.trim();
       fileInput.value = ''; // Reset file input for repeated uploads
-      updatePoints();
-      updateIsochrone();
     } catch (error) {
       alert(error.message);
       textarea.value = ''; // Clear textarea on error
@@ -202,3 +259,5 @@ function setupFileInput() {
   });
 }
 document.addEventListener('DOMContentLoaded', setupFileInput);
+
+updatePoints();
