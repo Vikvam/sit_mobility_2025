@@ -138,6 +138,9 @@ let getIntersectionOfFeatures = (geojson) => {
 }
 
 let location = {lat: 50.08804, lng: 14.42076};
+if (new URLSearchParams(window.location.search).get("mode") === "shorim") {
+  location = {lat: 49.74747, lng: 13.37769};
+}
 let map = L.map("map").setView(location, 13);
 let points = [];
 let isos = [];
