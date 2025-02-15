@@ -94,7 +94,7 @@ body {
 
 .operations, .times, .radio-group {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 }
 
 .categories {
@@ -106,6 +106,25 @@ body {
   border: 1px solid var(--surface-3);
   border-radius: var(--radius-2);
   padding: 1em;
+}
+
+details {
+    width: calc(100% - 2em);
+    background: var(--surface-2);
+    border-radius: var(--radius-2);
+    padding: var(--size-3);
+}
+
+summary {
+    cursor: pointer;
+    font-weight: var(--font-weight-600);
+    color: var(--brand);
+    padding: var(--size-2);
+}
+
+summary:hover {
+    background: var(--surface-3);
+    border-radius: var(--radius-1);
 }
 
 label {
