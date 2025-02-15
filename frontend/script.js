@@ -1,3 +1,9 @@
+function generateColor(index) {
+    const goldenRatio = 0.618033988749895;
+    const hue = (goldenRatio * index) % 1;
+    return `hsl(${Math.floor(hue * 360)}, 70%, 50%)`;
+}
+
 let getIsochrone = async ({location: {lat, lng}, time, minutes}) => {
     let params = new URLSearchParams();
     params.append("batch", "true");
@@ -58,6 +64,10 @@ let addPoint = (name, location) => {
         alt: point.name,
         draggable: true,
         autoPan: true,
+        icon: L.divIcon({
+            className: 'custom-marker',
+            html: `<div style='background-color: ${generateColor(points.length)}; width: 1em; height: 1em;'></div>`
+        })
     })
         .addTo(map)
         .on("move", (event) => (markerLocation = event.latlng))
@@ -111,7 +121,7 @@ let updateIsochrone = () => {
             if (unionLayer) {
                 unionLayer.remove();
             }
-            unionLayer = L.geoJSON(union, {color: "orange"}).addTo(map);
+            unionLayer = L.geoJSON(union, {color: generateColor(points.length)}).addTo(map);
         }
     });
 };
