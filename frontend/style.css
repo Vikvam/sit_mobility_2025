@@ -168,6 +168,16 @@ h1 {
 body.potkej-se .potkej-se-hide {
   display: none;
 }
+body.potkej-se {
+  --brand: var(--pink-4);
+  --surface-1: var(--pink-10);
+  --surface-2: var(--purple-12);
+}
 body.uhorim .uhorim-hide {
   display: none;
+}
+body.uhorim {
+  --brand: var(--orange-4);
+  --surface-1: var(--orange-10);
+  --surface-2: var(--red-12);
 }
