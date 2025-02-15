@@ -146,9 +146,9 @@ time.value = date.toISOString().slice(0, 16);
 let getIsochroneLayer = (isochrone, color) => {
     return L.geoJSON(isochrone, {
         color: color,
-        // filter: (feature) => {
-        //     return feature.geometry.type === 'Polygon' || feature.geometry.type === "MultiPolygon";
-        // }
+        filter: (feature) => {
+            return individual_en.checked;
+        }
     }).addTo(map);
 }
 
@@ -253,12 +253,12 @@ let updateIsochrones = () => {
     for (let layer of isochroneLayers) { layer.remove(); }
     // Create new layers from isos
     isochroneLayers = [];
-        isos.forEach((isochrone, idx) => {
-            console.log(idx);
-            let layer = getIsochroneLayer(isochrone, points[idx].color);
-            layer.addTo(map);
-            isochroneLayers.push(layer);
-        });
+    isos.forEach((isochrone, idx) => {
+        console.log(idx);
+        let layer = getIsochroneLayer(isochrone, points[idx].color);
+        layer.addTo(map);
+        isochroneLayers.push(layer);
+    });
 };
 let updatePointsInput = () => {
     pointsInput.value = points
