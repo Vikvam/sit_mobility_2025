@@ -1,6 +1,7 @@
-function generateColor(index) {
+let colorIndex = 0
+function generateColor() {
     const goldenRatio = 0.618033988749895;
-    const hue = (goldenRatio * index) % 1;
+    const hue = (goldenRatio * colorIndex++) % 1;
     return `hsl(${Math.floor(hue * 360)}, 70%, 50%)`;
 }
 
@@ -191,7 +192,7 @@ let updateIntersectionLayer = () => {
 let addPoint = (name, location) => {
     let markerLocation = null;
     const routingEngine = document.querySelector('input[name="routing-engine"]:checked').value;
-    let color = generateColor(points.length);
+    let color = generateColor();
     let point = {name, location, routingEngine, color};
     point.marker = L.marker(point.location, {
         title: point.name,
