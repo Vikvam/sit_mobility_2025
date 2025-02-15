@@ -146,8 +146,14 @@ let addPoint = (name, location) => {
         .on("move", (event) => (markerLocation = event.latlng))
         .on("moveend", () => {
             point.location = markerLocation;
-            updatePointsInput();
-            recomputeIsochrones();
+            removePoint(point);
+            addPoint(point.name, point.location);
+            // let index = points.findIndex((p) => p === point);
+            // isos.splice(index, 1);
+            // updatePointsInput();
+            // recomputeIsochrones();
+            // updateUnionLayer();
+            // updateIntersectionLayer();
         })
         .on("click", () => {
             removePoint(point);
@@ -203,9 +209,7 @@ let recomputeIsochrones = () => {
 };
 
 let updateIsochrones = () => {
-    for (let layer of isochroneLayers) {
-        layer.remove();
-    }
+    for (let layer of isochroneLayers) { layer.remove(); }
     isochroneLayers = [];
 
     // Create new layers from isos
