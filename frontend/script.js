@@ -449,3 +449,27 @@ getOTPRoute("https://otp.basta.one", "default", {lat: 50.0755, lon: 14.4378}, {
 
 
 // updatePoints();
+
+{ // modes
+  let setName = (name) => {
+    document.querySelector("title").textContent = name;
+    document.querySelector("h1").textContent = name;
+  }
+  let params = new URLSearchParams(window.location.search);
+  let mode = params.get("mode");
+  document.body.classList.add(mode);
+  switch (mode) {
+    case "potkej-se":
+      setName("Potkej se");
+      intersect_en.checked = true;
+      union_en.checked = false;
+      break;
+    case "uhorim":
+      setName("Uhořim");
+      document.querySelector('input[value="valhalla"]').checked = true;
+      individual_en.checked = false;
+      intersect_en.checked = false;
+      union_en.checked = true;
+      break;
+  }
+}
