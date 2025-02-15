@@ -50,7 +50,6 @@ let getIsochrone = async ({location: {lat, lng}, time, minutes, routingEngine}) 
         
         if (response.ok) {
             const data = await response.json();
-            console.log(data);
             return {
                 type: "FeatureCollection",
                 features: data.features.filter(feature => 
@@ -190,10 +189,10 @@ let addIsochrone = (point) => {
             console.log("points", points);
             console.log("isos", isos);
             console.log("isochroneLayers", isochroneLayers);
+            updateUnionLayer();
+            updateIntersectionLayer();
         })
 
-        updateUnionLayer();
-        updateIntersectionLayer();
     } catch (error) {
         console.error(`Failed to add isochrone for point ${point}:`, error);
     }
