@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="leaflet/leaflet.css"/>
     <link rel="stylesheet" href="style.css"/>
     <script src="https://unpkg.com/polyline"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
-    <script src="leaflet/leaflet.js"></script>
+s    <script src="leaflet/leaflet.js"></script>
     <script type="module" src="script.js"></script>
 
 </head>
@@ -18,6 +17,11 @@
 <h1>Dojezdník</h1>
 <div class="wrapper">
     <div class="controls">
+        <div class="button-container">
+            <button class="round-button blue-button" onclick="window.location.href='/'">Dojezdník</button>
+            <button class="round-button red-button" onclick="window.location.search='mode=shorim'">Shořím?</button>
+            <button class="round-button black-button" onclick="window.location.search='mode=potkejse'">Potkej se</button>
+        </div>
         <div class="radio-group potkej-se-hide uhorim-hide">
             <span>
                 Mód dopravy:
