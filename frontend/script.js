@@ -293,7 +293,7 @@ let updatePointsInput = () => {
         )
         .join("\n");
 };
-let updatePoints = () => {
+let updatePoints = async () => {
     points.forEach((point) => removePoint(point));
     points = [];
     for (let line of pointsInput.value.split("\n")) {
@@ -302,6 +302,7 @@ let updatePoints = () => {
             let [_, lat, lng, name] = match;
             name = name ?? "";
             addPoint(name, {lat, lng});
+            await new Promise(resolve => setTimeout(resolve, 10));
         } else {
             console.log("Invalid line: " + line);
             return;
