@@ -155,3 +155,40 @@ map.on("click", (event) => {
 });
 updatePoints();
 updateIsochrone();
+
+function setupFileInput() {
+  const fileInput = document.getElementById('points-file');
+  const textarea = document.getElementById('points');
+
+  fileInput.addEventListener("change", async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      // Basic validation - check if each line has 3 comma-separated values
+      const lines = text.trim().split('\n');
+      const isValid = lines.every(line => {
+        const parts = line.trim().split(',');
+        return parts.length >= 2 && 
+               !isNaN(parseFloat(parts[0])) && 
+               !isNaN(parseFloat(parts[1]));
+      });
+
+      if (!isValid) {
+          console.log(text);
+          throw new Error('Invalid file format. Each line must contain: latitude,longitude,name');
+      }
+
+      textarea.value = text.trim();
+      fileInput.value = ''; // Reset file input for repeated uploads
+      updatePoints();
+      updateIsochrone();
+    } catch (error) {
+      alert(error.message);
+      textarea.value = ''; // Clear textarea on error
+      fileInput.value = ''; // Reset file input
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', setupFileInput);
