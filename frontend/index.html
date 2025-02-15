@@ -17,7 +17,7 @@
 <body>
 <h1>Dojezdník</h1>
 <div class="wrapper">
-    <div class="controls shorim-hide">
+    <div class="controls">
         <div class="button-container">
             <button class="round-button blue-button" onclick="window.location.href='/'">Dojezdník</button>
             <button class="round-button red-button" onclick="window.location.search='mode=shorim'">Shořím?</button>
@@ -34,7 +34,7 @@
                 <input type="radio" name="routing-engine" value="valhalla"> Automobil
             </label>
         </div>
-        <div class="times">
+        <div class="times shorim-hide">
             <label class="shorim-hide"
             >Čas cesty: <input id="time" type="datetime-local" value="2025-02-14T12:00"/>
             </label>
@@ -43,7 +43,7 @@
             /></label>
         </div>
 
-        <div class="operations">
+        <div class="operations shorim-hide">
             <label class="potkej-se-hide shorim-hide" for="union_en">Sjednotit oblasti<input type="checkbox" id="union_en"></label>
             <label class="potkej-se-hide shorim-hide" for="intersect_en">Najít průsečík oblastí <input type="checkbox" id="intersect_en"></label>
             <label class="shorim-hide" for="individual_en">Zobrazit jednotlivé isochrony <input type="checkbox" id="individual_en"
