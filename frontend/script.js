@@ -189,12 +189,6 @@ let addPoint = (name, location) => {
             point.location = markerLocation;
             removePoint(point);
             addPoint(point.name, point.location);
-            // let index = points.findIndex((p) => p === point);
-            // isos.splice(index, 1);
-            // updatePointsInput();
-            // recomputeIsochrones();
-            // updateUnionLayer();
-            // updateIntersectionLayer();
         })
         .on("click", () => {
             removePoint(point);
@@ -246,7 +240,15 @@ let unionLayer = null;
 let intersectLayer = null;
 
 let recomputeIsochrones = () => {
-    Promise.all(points.map((point) => addIsochrone(point))).then(updateIsochrones)
+    for (let layer of isochroneLayers) { layer.remove(); }
+    isos = [];
+    // Promise.all(points.map((point) => addIsochrone(point))).then(updateIsochrones)
+    (async () => {
+        for (let i = 0; i < points.length; i++) {
+            await addIsochrone(points[i]);
+        }
+        updateIsochrones();
+    })();
 };
 
 let updateIsochrones = () => {
@@ -286,8 +288,12 @@ let updatePoints = () => {
     }
 };
 
-minutes.addEventListener("change", recomputeIsochrones);
-time.addEventListener("change", recomputeIsochrones);
+minutes.addEventListener("change", () => {
+    recomputeIsochrones();
+});
+time.addEventListener("change", () => {
+    recomputeIsochrones();
+});
 union_en.addEventListener("change", () => {
     updateIsochrones();
     updateUnionLayer();
