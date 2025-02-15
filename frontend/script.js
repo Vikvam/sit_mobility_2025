@@ -151,7 +151,7 @@ let getIsochroneLayer = (isochrone, color) => {
 
 let updateUnionLayer = () => {
     if (unionLayer) { unionLayer.remove(); }
-    if (isos.length > 1) {
+    if (isos.length > 1 && union_en.checked) {
         let union = getUnionOfFeatures(combineGeoJsons(isos));
         console.log(union);
         console.log(unionLayer);
@@ -248,8 +248,6 @@ let updateIsochrones = () => {
     for (let layer of isochroneLayers) {
         layer.remove();
     }
-    isochroneLayers = [];
-
     // Create new layers from isos
     isochroneLayers = [];
     isos.forEach((isochrone, idx) => {
