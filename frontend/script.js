@@ -97,13 +97,34 @@ date.setUTCHours(date.getHours());
 time.value = date.toISOString().slice(0, 16);
 
 let getIsochroneLayer = (isochrone, color) => {
-    console.log(isochrone);
     return L.geoJSON(isochrone, {
         color: color,
         filter: (feature) => {
-            return feature.geometry.type === 'Polygon';
+            return feature.geometry.type === 'Polygon' || feature.geometry.type === "MultiPolygon";
         }
     }).addTo(map);
+}
+
+let updateUnionLayer = () => {
+    // if (isos.length > 1) {
+    //         let union = getUnionOfFeatures(combineGeoJsons(isos));
+    //         if (unionLayer) {
+    //             unionLayer.remove();
+    //         }
+    //     unionLayer = L.geoJSON(union, {color: "green"}).addTo(map);
+    //
+    //     }
+}
+
+let updateIntersectionLayer = () => {
+        // if (isos.length > 1) {
+        // if (intersectLayer) {
+        //         intersectLayer.remove();
+        //     }
+        //     let intersection = getIntersectionOfFeatures(combineGeoJsons(isos));
+        //     intersectLayer = L.geoJSON(intersection, {color: "red"}).addTo(map);
+        //
+        // }
 }
 
 let addPoint = (name, location) => {
@@ -145,7 +166,8 @@ let removePoint = (point) => {
     updatePointsInput();
     updateIsochrones();
         
-    // TODO: updateUnionLayer();
+    updateUnionLayer();
+    updateIntersectionLayer();
     
 };
 let addIsochrone = (point) => {
@@ -159,25 +181,13 @@ let addIsochrone = (point) => {
             isos.push(isochrone);
             isochroneLayers.push(getIsochroneLayer(isochrone, point.color));
             
-            console.log(points);
-            console.log(isos);
-            console.log(isochroneLayers);
+            console.log("points", points);
+            console.log("isos", isos);
+            console.log("isochroneLayers", isochroneLayers);
         })
 
-        // TODO: FIX! Update union if multiple isochrones exist
-        if (isos.length > 1) {
-            let union = getUnionOfFeatures(combineGeoJsons(isos));
-            if (unionLayer) {
-                unionLayer.remove();
-            }
-            if (intersectLayer) {
-                intersectLayer.remove();
-            }
-            unionLayer = L.geoJSON(union, {color: "green"}).addTo(map);
-            let intersection = getIntersectionOfFeatures(combineGeoJsons(isos));
-            intersectLayer = L.geoJSON(intersection, {color: "red"}).addTo(map);
-
-        }
+        updateUnionLayer();
+        updateIntersectionLayer();
     } catch (error) {
         console.error(`Failed to add isochrone for point ${point}:`, error);
     }
@@ -200,6 +210,7 @@ let updateIsochrones = () => {
     // Create new layers from isos
     isochroneLayers = [];
     isos.forEach((isochrone, idx) => {
+        console.log(idx);
         let layer = getIsochroneLayer(isochrone, points[idx].color);
         layer.addTo(map);
         isochroneLayers.push(layer);
