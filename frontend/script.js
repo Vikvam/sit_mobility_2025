@@ -37,6 +37,26 @@ async function getOTPRoute(otpHost, routerId, from, to, options = {}) {
     }
 }
 
+async function getOSMPlaces(location, category, apiKey, radius=1000, limit=20) {
+  try {
+    const response = await fetch(
+      `https://api.geoapify.com/v2/places?categories=${category}&` +
+      `filter=circle:${location.lng},${location.lat},${radius}&` +
+      `limit=${limit}&apiKey=${apiKey}`
+    );
+    
+    const data = await response.json();
+    return data.features.map(feature => ({
+      name: feature.properties.name,
+      lat: feature.properties.lat,
+      lng: feature.properties.lon
+    }));
+  } catch (error) {
+    console.error("OSM Geoapify Error:", error);
+    return [];
+  }
+}
+
 let getIsochrone = async ({location: {lat, lng}, time, minutes, routingEngine}) => {
     if (routingEngine === 'OTP') {
         let params = new URLSearchParams();
@@ -273,7 +293,7 @@ let updatePointsInput = () => {
         )
         .join("\n");
 };
-let updatePoints = () => {
+let updatePoints = async () => {
     points.forEach((point) => removePoint(point));
     points = [];
     for (let line of pointsInput.value.split("\n")) {
@@ -282,6 +302,7 @@ let updatePoints = () => {
             let [_, lat, lng, name] = match;
             name = name ?? "";
             addPoint(name, {lat, lng});
+            await new Promise(resolve => setTimeout(resolve, 10));
         } else {
             console.log("Invalid line: " + line);
             return;
@@ -295,6 +316,7 @@ minutes.addEventListener("change", () => {
 time.addEventListener("change", () => {
     recomputeIsochrones();
 });
+
 union_en.addEventListener("change", () => {
     updateIsochrones();
     updateUnionLayer();
@@ -304,16 +326,10 @@ intersect_en.addEventListener("change", () => {
     updateIntersectionLayer();
 });
 individual_en.addEventListener("change", updateIsochrones);
+
 pointsInput.addEventListener("change", () => {
     updatePoints();
 });
-map.on("click", (event) => {
-    location = event.latlng;
-    addPoint("", event.latlng);
-    updatePointsInput();
-    updateIsochrones();
-});
-
 function setupFileInput() {
     const fileInput = document.getElementById('points-file');
     const textarea = document.getElementById('points');
@@ -340,7 +356,7 @@ function setupFileInput() {
 
             textarea.value = text.trim();
             fileInput.value = ''; // Reset file input for repeated uploads
-
+            updatePoints();
         } catch (error) {
             alert(error.message);
             textarea.value = ''; // Clear textarea on error
@@ -348,6 +364,15 @@ function setupFileInput() {
         }
     });
 }
+document.addEventListener('DOMContentLoaded', setupFileInput);
+
+map.on("click", (event) => {
+    location = event.latlng;
+    addPoint("", event.latlng);
+    updatePointsInput();
+    updateIsochrones();
+});
+
 
 function plotOTPRoute(otpResponse) {
     const itinerary = otpResponse.plan.itineraries[0];
@@ -367,7 +392,6 @@ function plotOTPRoute(otpResponse) {
 
 }
 
-document.addEventListener('DOMContentLoaded', setupFileInput);
 // print random route  for prague
 getOTPRoute("https://otp.basta.one", "default", {lat: 50.0755, lon: 14.4378}, {
     lat: 50.0874,
