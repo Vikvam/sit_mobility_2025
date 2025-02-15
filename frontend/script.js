@@ -49,7 +49,14 @@ let getIsochrone = async ({location: {lat, lng}, time, minutes, routingEngine}) 
         );
         
         if (response.ok) {
-            return await response.json();
+            const data = await response.json();
+            console.log(data);
+            return {
+                type: "FeatureCollection",
+                features: data.features.filter(feature => 
+                    feature.geometry.type === 'Polygon'
+                )
+            };
         } else {
             throw new Error(`${response.status}: ${await response.text()}`);
         }
@@ -99,21 +106,20 @@ time.value = date.toISOString().slice(0, 16);
 let getIsochroneLayer = (isochrone, color) => {
     return L.geoJSON(isochrone, {
         color: color,
-        filter: (feature) => {
-            return feature.geometry.type === 'Polygon' || feature.geometry.type === "MultiPolygon";
-        }
+        // filter: (feature) => {
+        //     return feature.geometry.type === 'Polygon' || feature.geometry.type === "MultiPolygon";
+        // }
     }).addTo(map);
 }
 
 let updateUnionLayer = () => {
-    // if (isos.length > 1) {
-    //         let union = getUnionOfFeatures(combineGeoJsons(isos));
-    //         if (unionLayer) {
-    //             unionLayer.remove();
-    //         }
-    //     unionLayer = L.geoJSON(union, {color: "green"}).addTo(map);
-    //
-    //     }
+    if (unionLayer) { unionLayer.remove(); }
+    if (isos.length > 1) {
+        let union = getUnionOfFeatures(combineGeoJsons(isos));
+        console.log(union);
+        console.log(unionLayer);
+        unionLayer = L.geoJSON(union, {color: "green"}).addTo(map);
+    }
 }
 
 let updateIntersectionLayer = () => {
