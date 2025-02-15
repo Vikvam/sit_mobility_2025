@@ -45,7 +45,8 @@
                                                                           checked="true"></label>
         </div>
 
-        <div class="categories">
+        <details class="categories">
+            <summary>Zájmové kategorie</summary>
             <div class="location-input">
                 <input type="text" id="coordinates" value="14.4378,50.0755" placeholder="14.4378,50.0755" pattern="-?\d+\.\d+,-?\d+\.\d+">
             </div>
@@ -68,9 +69,10 @@
 <!--                    <input type="checkbox" class="osm-category" value="leisure.swimming_pool"> Bazény-->
 <!--                </label>-->
             </div>
-        </div>
+        </details>
 
-        <div class="potkej-se-hide" class="data-input">
+        <details class="potkej-se-hide data-input">
+            <summary>Nahrát body ze souboru</summary>
             <label>
                 Data (CSV):
             </label>
@@ -80,7 +82,7 @@
                 <input id="points-file" type="file" id="csvFile" accept=".csv"/>
             </div>
             <button id="uploadButton">Insert Data</button>
-        </div>
+        </details>
     </div>
     <div id="map" v-effect="updateIsochrone()"></div>
 </div>
