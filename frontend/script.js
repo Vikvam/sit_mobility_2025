@@ -477,10 +477,10 @@ async function loadServerGeoJSONs(urls) {
 
 function loadHasici() {
     const urls = ['./geojsons/hasici/hasici10.geojson', './geojsons/hasici/hasici20.geojson', './geojsons/hasici/hasici30.geojson'];
+    const colors = ['#00FF00', '#FFFF00', '#FF0000']; // Safe, mild danger, burning hot
     loadServerGeoJSONs(urls).then(geoJSONArray => {
         geoJSONArray.reverse().forEach((gj, index) => {
-            const intensity = Math.min(255, (index + 1) * (255 / urls.length)); // Increase intensity of red
-            const color = `rgb(${255 - intensity}, ${intensity}, 0)`; // Green to red
+            const color = colors[2-index] || '#FF0000'; // Default to burning hot if out of range
             L.geoJSON(getUnionOfFeatures(gj), {style: {color: color, fillColor: color}}).addTo(map);
         });
     });
