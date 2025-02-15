@@ -81,7 +81,7 @@ body {
 .controls {
   margin-block: var(--size-3);
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: column wrap;
   flex-shrink: 1;
   flex-grow: 0;
   gap: var(--size-3);
@@ -90,6 +90,22 @@ body {
   padding: var(--size-3);
   border-radius: var(--radius-2);
   box-shadow: var(--shadow-1);
+}
+
+.operations, .times, .radio-group {
+  display: flex;
+  flex-direction: row;
+}
+
+.categories {
+  display: flex;
+  flex-direction: column;
+}
+
+.data-input, .categories {
+  border: 1px solid var(--surface-3);
+  border-radius: var(--radius-2);
+  padding: 1em;
 }
 
 label {

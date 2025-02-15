@@ -155,6 +155,7 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 let minutes = document.getElementById("minutes");
 let time = document.getElementById("time");
 let pointsInput = document.getElementById("points");
+const uploadButton = document.getElementById('uploadButton');
 
 let union_en = document.getElementById("union_en");
 let intersect_en = document.getElementById("intersect_en");
@@ -175,7 +176,7 @@ let getIsochroneLayer = (isochrone, color) => {
 
 let updateUnionLayer = () => {
     if (unionLayer) { unionLayer.remove(); }
-    if (isos.length > 1&& union_en.checked) {
+    if (isos.length > 1 && union_en.checked) {
         let union = getUnionOfFeatures(combineGeoJsons(isos));
         unionLayer = L.geoJSON(union, {color: "green"}).addTo(map);
     }
@@ -243,9 +244,9 @@ let addIsochrone = (point) => {
             isos.push(isochrone);
             isochroneLayers.push(getIsochroneLayer(isochrone, point.color));
 
-            console.log("points", points);
-            console.log("isos", isos);
-            console.log("isochroneLayers", isochroneLayers);
+            // console.log("points", points);
+            // console.log("isos", isos);
+            // console.log("isochroneLayers", isochroneLayers);
             updateUnionLayer();
             updateIntersectionLayer();
         })
@@ -277,7 +278,6 @@ let updateIsochrones = () => {
     // Create new layers from isos
     isochroneLayers = [];
     isos.forEach((isochrone, idx) => {
-        console.log(idx);
         let layer = getIsochroneLayer(isochrone, points[idx].color);
         layer.addTo(map);
         isochroneLayers.push(layer);
@@ -294,7 +294,6 @@ let updatePointsInput = () => {
         .join("\n");
 };
 let updatePoints = async () => {
-    points.forEach((point) => removePoint(point));
     points = [];
     for (let line of pointsInput.value.split("\n")) {
         let match = line.match(/^(\d+\.\d+),(\d+\.\d+)(?:,([^,]+))?$/);
@@ -302,6 +301,7 @@ let updatePoints = async () => {
             let [_, lat, lng, name] = match;
             name = name ?? "";
             addPoint(name, {lat, lng});
+            console.log(points)
             await new Promise(resolve => setTimeout(resolve, 10));
         } else {
             console.log("Invalid line: " + line);
@@ -327,9 +327,11 @@ intersect_en.addEventListener("change", () => {
 });
 individual_en.addEventListener("change", updateIsochrones);
 
-pointsInput.addEventListener("change", () => {
+// pointsInput.addEventListener("change", () => { updatePoints(); });
+uploadButton.addEventListener('click', () => {
     updatePoints();
 });
+
 function setupFileInput() {
     const fileInput = document.getElementById('points-file');
     const textarea = document.getElementById('points');
@@ -356,7 +358,6 @@ function setupFileInput() {
 
             textarea.value = text.trim();
             fileInput.value = ''; // Reset file input for repeated uploads
-            updatePoints();
         } catch (error) {
             alert(error.message);
             textarea.value = ''; // Clear textarea on error
@@ -365,6 +366,53 @@ function setupFileInput() {
     });
 }
 document.addEventListener('DOMContentLoaded', setupFileInput);
+
+// Global object to store markers by category
+let categoryMarkers = {};
+
+const addMarkersToMap = (places, category) => {
+    // Initialize array for this category if it doesn't exist
+    if (!categoryMarkers[category]) {
+        categoryMarkers[category] = [];
+    }
+
+    // Create markers for each place
+    places.forEach(place => {
+        const marker = L.marker([place.lat, place.lng]).addTo(map);
+        marker.bindPopup(`<b>${place.name || category}</b><br>${place.address || ''}`);
+        categoryMarkers[category].push(marker);
+    });
+};
+
+const removeMarkersFromMap = (category) => {
+    if (categoryMarkers[category]) {
+        categoryMarkers[category].forEach(marker => marker.remove());
+        categoryMarkers[category] = [];
+    }
+};
+
+document.querySelectorAll('.osm-category').forEach(checkbox => {
+    checkbox.addEventListener('change', async (event) => {
+        if (event.target.checked) {
+            try {
+                const category = event.target.value;
+                const coordInput = document.getElementById('coordinates').value;
+                const [lng, lat] = coordInput.split(',').map(coord => parseFloat(coord.trim()));
+                const center = {lat, lng};
+                const results = await getOSMPlaces(center, category, "86dafd30d1e54c25b0021d11af1de5da", 10000);
+                console.log(`Places for ${category} at ${lng} ${lat}:`, results);
+                addMarkersToMap(results, category);
+            } catch (error) {
+                console.error('Failed to fetch OSM places:', error);
+            }
+        } else {
+            const category = event.target.value;
+            removeMarkersFromMap(category);
+        }
+    });
+});
+
+
 
 map.on("click", (event) => {
     location = event.latlng;
@@ -399,4 +447,5 @@ getOTPRoute("https://otp.basta.one", "default", {lat: 50.0755, lon: 14.4378}, {
 }).then(plotOTPRoute);
 
 
-updatePoints();
+
+// updatePoints();
