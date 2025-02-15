@@ -319,7 +319,7 @@ let updatePoints = async () => {
             name = name ?? "";
             addPoint(name, {lat, lng});
             console.log(points)
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await new Promise(resolve => setTimeout(resolve, 50));
         } else {
             console.log("Invalid line: " + line);
             return;
