@@ -154,7 +154,7 @@ let getIsochroneLayer = (isochrone, color) => {
 
 let updateUnionLayer = () => {
     if (unionLayer) { unionLayer.remove(); }
-    if (isos.length > 1) {
+    if (isos.length > 1&& union_en.checked) {
         let union = getUnionOfFeatures(combineGeoJsons(isos));
         unionLayer = L.geoJSON(union, {color: "green"}).addTo(map);
     }
@@ -162,7 +162,7 @@ let updateUnionLayer = () => {
 
 let updateIntersectionLayer = () => {
     if (intersectLayer) { intersectLayer.remove(); }
-    if (isos.length > 1) {
+    if (isos.length > 1 && intersect_en.checked) {
         let intersection = getIntersectionOfFeatures(combineGeoJsons(isos));
         intersectLayer = L.geoJSON(intersection, {color: "black"}).addTo(map);
     }
@@ -288,8 +288,14 @@ let updatePoints = () => {
 
 minutes.addEventListener("change", recomputeIsochrones);
 time.addEventListener("change", recomputeIsochrones);
-union_en.addEventListener("change", updateIsochrones);
-intersect_en.addEventListener("change", updateIsochrones);
+union_en.addEventListener("change", () => {
+    updateIsochrones();
+    updateUnionLayer();
+});
+intersect_en.addEventListener("change", () => {
+    updateIsochrones();
+    updateIntersectionLayer();
+});
 individual_en.addEventListener("change", updateIsochrones);
 pointsInput.addEventListener("change", () => {
     updatePoints();
