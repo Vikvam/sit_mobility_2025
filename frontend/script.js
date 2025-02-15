@@ -1,4 +1,5 @@
 let colorIndex = 0
+
 function generateColor() {
     const goldenRatio = 0.618033988749895;
     const hue = (goldenRatio * colorIndex++) % 1;
@@ -37,24 +38,24 @@ async function getOTPRoute(otpHost, routerId, from, to, options = {}) {
     }
 }
 
-async function getOSMPlaces(location, category, apiKey, radius=1000, limit=20) {
-  try {
-    const response = await fetch(
-      `https://api.geoapify.com/v2/places?categories=${category}&` +
-      `filter=circle:${location.lng},${location.lat},${radius}&` +
-      `limit=${limit}&apiKey=${apiKey}`
-    );
-    
-    const data = await response.json();
-    return data.features.map(feature => ({
-      name: feature.properties.name,
-      lat: feature.properties.lat,
-      lng: feature.properties.lon
-    }));
-  } catch (error) {
-    console.error("OSM Geoapify Error:", error);
-    return [];
-  }
+async function getOSMPlaces(location, category, apiKey, radius = 1000, limit = 20) {
+    try {
+        const response = await fetch(
+            `https://api.geoapify.com/v2/places?categories=${category}&` +
+            `filter=circle:${location.lng},${location.lat},${radius}&` +
+            `limit=${limit}&apiKey=${apiKey}`
+        );
+
+        const data = await response.json();
+        return data.features.map(feature => ({
+            name: feature.properties.name,
+            lat: feature.properties.lat,
+            lng: feature.properties.lon
+        }));
+    } catch (error) {
+        console.error("OSM Geoapify Error:", error);
+        return [];
+    }
 }
 
 let getIsochrone = async ({location: {lat, lng}, time, minutes, routingEngine}) => {
@@ -76,13 +77,12 @@ let getIsochrone = async ({location: {lat, lng}, time, minutes, routingEngine}) 
         } else {
             throw new Error(`${response.status}: ${await response.text()}`);
         }
-    }
-    else { // Valhalla
+    } else { // Valhalla
         const params = {
-            locations: [{ lat: lat, lon: lng }],
+            locations: [{lat: lat, lon: lng}],
             costing: "auto",
             contours: [
-                { time: parseInt(minutes), color: "ff0000" }
+                {time: parseInt(minutes), color: "ff0000"}
             ],
             polygons: true,
             show_locations: true,
@@ -174,8 +174,19 @@ let getIsochroneLayer = (isochrone, color) => {
     }).addTo(map);
 }
 
+let getIsochroneLayerNoFilter = (isochrone, color) => {
+    return L.geoJSON(isochrone, {
+        color: color,
+        filter: (feature) => {
+            return true;
+        }
+    }).addTo(map);
+}
+
 let updateUnionLayer = () => {
-    if (unionLayer) { unionLayer.remove(); }
+    if (unionLayer) {
+        unionLayer.remove();
+    }
     if (isos.length > 1 && union_en.checked) {
         let union = getUnionOfFeatures(combineGeoJsons(isos));
         unionLayer = L.geoJSON(union, {color: "green"}).addTo(map);
@@ -183,7 +194,9 @@ let updateUnionLayer = () => {
 }
 
 let updateIntersectionLayer = () => {
-    if (intersectLayer) { intersectLayer.remove(); }
+    if (intersectLayer) {
+        intersectLayer.remove();
+    }
     if (isos.length > 1 && intersect_en.checked) {
         let intersection = getIntersectionOfFeatures(combineGeoJsons(isos));
         intersectLayer = L.geoJSON(intersection, {color: "black"}).addTo(map);
@@ -262,7 +275,9 @@ let unionLayer = null;
 let intersectLayer = null;
 
 let recomputeIsochrones = () => {
-    for (let layer of isochroneLayers) { layer.remove(); }
+    for (let layer of isochroneLayers) {
+        layer.remove();
+    }
     isos = [];
     // Promise.all(points.map((point) => addIsochrone(point))).then(updateIsochrones)
     (async () => {
@@ -274,7 +289,9 @@ let recomputeIsochrones = () => {
 };
 
 let updateIsochrones = () => {
-    for (let layer of isochroneLayers) { layer.remove(); }
+    for (let layer of isochroneLayers) {
+        layer.remove();
+    }
     // Create new layers from isos
     isochroneLayers = [];
     isos.forEach((isochrone, idx) => {
@@ -365,6 +382,7 @@ function setupFileInput() {
         }
     });
 }
+
 document.addEventListener('DOMContentLoaded', setupFileInput);
 
 // Global object to store markers by category
@@ -440,32 +458,55 @@ function plotOTPRoute(otpResponse) {
 
 }
 
-// print random route  for prague
-getOTPRoute("https://otp.basta.one", "default", {lat: 50.0755, lon: 14.4378}, {
-    lat: 50.0874,
-    lon: 14.421
-}).then(plotOTPRoute);
+async function loadServerGeoJSONs(urls) {
+    try {
+        return await Promise.all(
+            urls.map(async url => {
+                const response = await fetch(url);
+                if (!response.ok) throw `HTTP error: ${response.status}`;
+                return response.json();
+            })
+        );
+    } catch (error) {
+        console.error('Load failed:', error);
+        return [];
+    }
+}
+
+// Usage:
+
+function loadHasici() {
+    const urls = ['./geojsons/hasici/hasici10.geojson', './geojsons/hasici/hasici20.geojson', './geojsons/hasici/hasici30.geojson'];
+    loadServerGeoJSONs(urls).then(geoJSONArray => {
+        geoJSONArray.reverse().forEach((gj, index) => {
+            const intensity = Math.min(255, (index + 1) * (255 / urls.length)); // Increase intensity of red
+            const color = `rgb(${255 - intensity}, ${intensity}, 0)`; // Green to red
+            L.geoJSON(getUnionOfFeatures(gj), {style: {color: color, fillColor: color}}).addTo(map);
+        });
+    });
+}
 
 
 
 // updatePoints();
 
 { // modes
-  let setName = (name) => {
-    document.querySelector("title").textContent = name;
-    document.querySelector("h1").textContent = name;
-  }
-  let params = new URLSearchParams(window.location.search);
-  let mode = params.get("mode");
-  document.body.classList.add(mode);
-  switch (mode) {
-    case "potkej-se":
-      setName("Potkej se");
-      intersect_en.checked = true;
-      union_en.checked = false;
-      break;
-    case "uhorim":
-      setName("Uhořim");
+    let setName = (name) => {
+        document.querySelector("title").textContent = name;
+        document.querySelector("h1").textContent = name;
+    }
+    let params = new URLSearchParams(window.location.search);
+    let mode = params.get("mode");
+    document.body.classList.add(mode);
+    switch (mode) {
+        case "potkej-se":
+            setName("Potkej se");
+            intersect_en.checked = true;
+            union_en.checked = false;
+            break;
+    case "shorim":
+      setName("Shořim?");
+      loadHasici()
       document.querySelector('input[value="valhalla"]').checked = true;
       individual_en.checked = false;
       intersect_en.checked = false;
