@@ -137,7 +137,7 @@ let getIntersectionOfFeatures = (geojson) => {
     return intersection;
 }
 
-let location = {lat: 49.74747, lng: 13.37759};
+let location = {lat: 50.08804, lng: 14.42076};
 let map = L.map("map").setView(location, 13);
 let points = [];
 let isos = [];
