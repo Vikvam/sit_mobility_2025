@@ -14,20 +14,24 @@
 
   </head>
   <body>
-    <h1>IzoChro</h1>
+    <h1>MaxiChron</h1>
     <div class="controls">
       <label
-        >Čas: <input id="time" type="datetime-local" value="2025-02-14T12:00" />
+        >Čas cesty: <input id="time" type="datetime-local" value="2025-02-14T12:00" />
       </label>
       <label
-        >Limit (min): <input id="minutes" type="number" value="20"
+        >Maximální vzálenost (min): <input id="minutes" type="number" value="20"
       /></label>
-      <label
-        >Body:
-        <textarea id="points" rows="3" cols="30">
-49.74747,13.37759,Centrum</textarea
-        >
-      </label>
+      <div class="data-input">
+        <label>
+          Data (CSV):
+        </label>
+        <textarea id="points" rows="5" placeholder="lat,lon,Name"></textarea>
+          <div class="file-input-wrapper">
+            <span class="file-input-text">nebo vložte data ze souboru:</span>
+            <input id="points-file" type="file" id="csvFile" accept=".csv" />
+          </div>
+      </div>
     </div>
     <div id="map" v-effect="updateIsochrone()"></div>
   </body>
